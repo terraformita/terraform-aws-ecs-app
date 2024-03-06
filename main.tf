@@ -9,10 +9,6 @@ locals {
   ecs_cluster_arn  = module.ecs_autoscaling.cluster_arn
   ecs_cluster_name = "${local.stage_name}-ecs-asg"
 
-  # app_containers_map = {
-  #   for container in var.app_containers : container.name => container
-  # }
-
   app_containers_map = var.containers
 
   host_containers_map = {

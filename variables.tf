@@ -113,6 +113,9 @@ variable "containers" {
     secret_vars = optional(map(string), {})
     disk_drive = optional(object({
       enabled = optional(bool, false)
+      # allowed types are: efs, ebs
+      type    = optional(string, "efs")
+      shared  = optional(bool, false)
       size_gb = optional(number, 10)
       path    = optional(string, "/mnt/data")
       uid     = optional(number, 2001)
