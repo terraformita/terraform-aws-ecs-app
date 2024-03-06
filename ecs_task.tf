@@ -56,15 +56,15 @@ resource "aws_ecs_task_definition" "app" {
       ]
       mountPoints = each.value.disk_drive.enabled ? [
         {
-          sourceVolume  = "efs_volume"
+          sourceVolume  = "${each.value.disk_drive.type}_volume"
           containerPath = each.value.disk_drive.path
-          readOnly      = false
+          readOnly      = each.value.disk_drive.read_only
         }
       ] : []
     }
   ])
   dynamic "volume" {
-    for_each = each.value.disk_drive.enabled ? [1] : []
+    for_each = each.value.disk_drive.enabled && each.value.disk_drive.type == "efs" ? [1] : []
     content {
       name = "efs_volume"
       efs_volume_configuration {
@@ -73,6 +73,21 @@ resource "aws_ecs_task_definition" "app" {
 
         authorization_config {
           access_point_id = aws_efs_access_point.efs_file_system[each.key].id
+        }
+      }
+    }
+  }
+  dynamic "volume" {
+    for_each = each.value.disk_drive.enabled && each.value.disk_drive.type == "ebs" ? [1] : []
+    content {
+      name = "ebs_volume"
+
+      docker_volume_configuration {
+        scope         = each.value.disk_drive.shared ? "shared" : "task"
+        autoprovision = true
+        driver        = "local"
+        driver_opts = {
+          "o" = "size=${each.value.disk_drive.size_gb}G,uid=${each.value.disk_drive.uid},gid=${each.value.disk_drive.gid}"
         }
       }
     }
