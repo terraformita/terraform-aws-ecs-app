@@ -122,6 +122,8 @@ variable "containers" {
       uid         = optional(number, 2001)
       gid         = optional(number, 2001)
       permissions = optional(string, "755")
+      fstype      = optional(string, "ext4")
+      device      = optional(string, "/dev/xvdf")
     }), {})
 
     health_check = optional(object({

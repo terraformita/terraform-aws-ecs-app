@@ -89,7 +89,9 @@ resource "aws_ecs_task_definition" "app" {
         autoprovision = true
         driver        = "local"
         driver_opts = {
-          "o" = "size=${each.value.disk_drive.size_gb}G,uid=${each.value.disk_drive.uid},gid=${each.value.disk_drive.gid}"
+          "type"   = each.value.disk_drive.fstype
+          "device" = each.value.disk_drive.device
+          "o"      = "size=${each.value.disk_drive.size_gb}G,uid=${each.value.disk_drive.uid},gid=${each.value.disk_drive.gid}"
         }
       }
     }
