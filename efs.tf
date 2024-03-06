@@ -55,7 +55,7 @@ resource "aws_efs_access_point" "efs_file_system" {
     creation_info {
       owner_uid   = each.value.uid
       owner_gid   = each.value.gid
-      permissions = "755"
+      permissions = each.value.permissions
     }
   }
 }

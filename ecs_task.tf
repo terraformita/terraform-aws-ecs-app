@@ -63,8 +63,9 @@ resource "aws_ecs_task_definition" "app" {
       ] : []
     }
   ])
+
   dynamic "volume" {
-    for_each = each.value.disk_drive.enabled && each.value.disk_drive.type == "efs" ? [1] : []
+    for_each = each.value.disk_drive.type == "efs" ? [1] : []
     content {
       name = "efs_volume"
       efs_volume_configuration {
@@ -77,13 +78,14 @@ resource "aws_ecs_task_definition" "app" {
       }
     }
   }
+
   dynamic "volume" {
-    for_each = each.value.disk_drive.enabled && each.value.disk_drive.type == "ebs" ? [1] : []
+    for_each = each.value.disk_drive.type == "ebs" ? [1] : []
     content {
       name = "ebs_volume"
 
       docker_volume_configuration {
-        scope         = each.value.disk_drive.shared ? "shared" : "task"
+        scope         = each.value.disk_drive.persistent ? "shared" : "task"
         autoprovision = true
         driver        = "local"
         driver_opts = {
