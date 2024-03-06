@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "app" {
           valueFrom = try(aws_ssm_parameter.secret["${each.key}_${var}"].arn, aws_ssm_parameter.secret_placeholder["${each.key}_${var}"].arn)
         }
       ]
-      mountPoints = each.value.disk_drive.enabled ? [
+      mountPoints = each.value.disk_drive_enabled ? [
         {
           sourceVolume  = "${each.value.disk_drive.type}_volume"
           containerPath = each.value.disk_drive.path

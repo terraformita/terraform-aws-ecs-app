@@ -41,7 +41,7 @@ resource "aws_efs_mount_target" "efs_mount_target" {
 resource "aws_efs_access_point" "efs_file_system" {
   for_each = {
     for container, config in local.app_containers_map :
-    container => config.disk_drive if config.disk_drive.enabled
+    container => config.disk_drive if config.disk_drive.type == "efs"
   }
 
   file_system_id = aws_efs_file_system.efs_file_system.id
