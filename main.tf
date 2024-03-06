@@ -9,7 +9,12 @@ locals {
   ecs_cluster_arn  = module.ecs_autoscaling.cluster_arn
   ecs_cluster_name = "${local.stage_name}-ecs-asg"
 
-  app_containers_map = var.containers
+  app_containers_map = {
+    for name, container in var.containers:
+    name => merge(container, {
+      disk_drive_enabled = contains(["efs", "ebs"], container.disk_drive.type)
+    })
+  }
 
   host_containers_map = {
     for hostname in local.host_names :

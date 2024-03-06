@@ -114,13 +114,14 @@ variable "containers" {
     disk_drive = optional(object({
       enabled = optional(bool, false)
       # allowed types are: efs, ebs
-      type      = optional(string, "efs")
-      shared    = optional(bool, false)
-      size_gb   = optional(number, 10)
-      read_only = optional(bool, false)
-      path      = optional(string, "/mnt/data")
-      uid       = optional(number, 2001)
-      gid       = optional(number, 2001)
+      type        = optional(string, "none")
+      persistent  = optional(bool, false)
+      size_gb     = optional(number, 10)
+      read_only   = optional(bool, false)
+      path        = optional(string, "/mnt/data")
+      uid         = optional(number, 2001)
+      gid         = optional(number, 2001)
+      permissions = optional(string, "755")
     }), {})
 
     health_check = optional(object({
