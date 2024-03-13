@@ -56,7 +56,7 @@ resource "aws_ssm_parameter" "secret" {
   name        = "/${local.stage_name}/${each.value.container}/${each.value.secret_name}"
   description = "Secret parameter for container ${each.value.container}"
   type        = "SecureString"
-  value       = try(local.replacements[each.value.container][each.value.placeholder], "empty")
+  value       = coalesce(try(local.replacements[each.value.container][each.value.placeholder], ""), "empty")
 
   tags = local.tags
 }
