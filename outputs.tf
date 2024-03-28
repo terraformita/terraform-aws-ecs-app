@@ -19,6 +19,7 @@ output "secrets" {
       }, {
       for var in aws_ssm_parameter.secret_placeholder : var.name => var.arn
     })
+    db_credentials_secret = aws_secretsmanager_secret.db_credentials
   }
 }
 
