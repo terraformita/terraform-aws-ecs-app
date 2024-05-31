@@ -59,6 +59,11 @@ resource "aws_ecs_service" "app" {
     }
   }
 
+  tags = merge(var.tags, {
+    service     = "${each.key}"
+    application = "${local.stage_name}"
+  })
+
   lifecycle {
     ignore_changes = [
       task_definition
