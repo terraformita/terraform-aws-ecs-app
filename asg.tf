@@ -26,15 +26,6 @@ module "ecs_security_group" {
       description = "ECS backend container connection"
       cidr_blocks = var.vpc.cidr
     }
-    ], [
-    {
-      rule        = "http-80-tcp"
-      cidr_blocks = var.vpc.cidr
-    },
-    {
-      rule        = "https-443-tcp"
-      cidr_blocks = var.vpc.cidr
-    }
   ])
 
   egress_cidr_blocks = ["0.0.0.0/0"]
