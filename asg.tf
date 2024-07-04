@@ -56,15 +56,14 @@ module "autoscaling" {
   image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = each.value.instance_type
 
-  instance_market_options = each.value.use_spot_instances == false ? {} : merge({},
-    {
-      market_type = "spot"
+  instance_market_options = {
+    market_type = each.value.use_spot_instances == false ? "" : "spot"
 
-      spot_options = {
-        max_price          = each.value.spot_instance_price
-        spot_instance_type = "one-time"
-      }
-  })
+    spot_options = {
+      max_price          = each.value.use_spot_instances == false ? 0 : each.value.spot_instance_price
+      spot_instance_type = "one-time"
+    }
+  }
 
   security_groups                 = [module.ecs_security_group.security_group_id]
   user_data                       = base64encode(local.user_data)
