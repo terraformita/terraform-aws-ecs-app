@@ -7,6 +7,15 @@ locals {
     ECS_LOGLEVEL=debug
     EOF
   EOT
+
+  asg_instance_market_options = {
+    market_type = "spot"
+
+    spot_options = {
+      max_price          = var.autoscaling_instances.use_spot_instances == false ? 0 : var.autoscaling_instances.spot_instance_price
+      spot_instance_type = "one-time"
+    }
+  }
 }
 
 #### SECURITY GROUP
@@ -57,12 +66,8 @@ module "autoscaling" {
   instance_type = each.value.instance_type
 
   instance_market_options = {
-    market_type = each.value.use_spot_instances == false ? "" : "spot"
-
-    spot_options = {
-      max_price          = each.value.use_spot_instances == false ? 0 : each.value.spot_instance_price
-      spot_instance_type = "one-time"
-    }
+    for k, v in local.asg_instance_market_options :
+    k => v if each.value.use_spot_instances == true
   }
 
   security_groups                 = [module.ecs_security_group.security_group_id]
