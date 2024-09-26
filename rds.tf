@@ -110,6 +110,7 @@ module "db" {
   performance_insights_enabled          = false
   performance_insights_retention_period = 7
   create_monitoring_role                = true
+  monitoring_role_name                  = "${local.stage_name}-rds-monitoring-role"
   monitoring_interval                   = 60
   create_random_password                = false
 

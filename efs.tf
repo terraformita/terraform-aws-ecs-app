@@ -1,5 +1,5 @@
 resource "aws_security_group" "efs_sg" {
-  name        = "efs-security-group"
+  name        = "${local.stage_name}-efs-security-group"
   description = "Security group for Amazon EFS"
 
   vpc_id = module.vpc.vpc_id
