@@ -13,7 +13,7 @@ variable "vpc" {
     public_subnet_ids       = optional(list(string))
     private_subnet_ids      = optional(list(string))
 
-    cidr             = string
+    vpc_cidr_block   = string
     azs              = optional(list(string))
     public_subnets   = optional(list(string))
     private_subnets  = optional(list(string))

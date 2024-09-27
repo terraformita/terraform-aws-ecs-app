@@ -33,7 +33,7 @@ module "ecs_security_group" {
       to_port     = container.port
       protocol    = "tcp"
       description = "ECS backend container connection"
-      cidr_blocks = var.vpc.cidr
+      cidr_blocks = var.vpc.vpc_cidr_block
     }
   ])
 
