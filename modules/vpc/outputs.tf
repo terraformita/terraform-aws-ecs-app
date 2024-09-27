@@ -14,6 +14,10 @@ output "private_subnets" {
   value = var.create_vpc ? module.vpc[0].private_subnets : var.config.private_subnet_ids
 }
 
+output "database_subnets" {
+  value = var.create_vpc ? module.vpc[0].database_subnets : var.config.database_subnet_ids
+}
+
 output "database_subnet_group" {
   value = var.create_vpc ? module.vpc[0].database_subnet_group : var.config.db_subnet_group_name
 }
