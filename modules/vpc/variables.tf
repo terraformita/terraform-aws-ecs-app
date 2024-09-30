@@ -1,18 +1,19 @@
 variable "config" {
   type = object({
     name             = string
-    cidr             = string
+    vpc_cidr_block   = string
     azs              = list(string)
     public_subnets   = optional(list(string))
     private_subnets  = optional(list(string))
     database_subnets = optional(list(string))
 
     vpc_id                  = optional(string)
-    db_subnet_group_name    = optional(string)
+    database_subnet_group   = optional(string)
     public_route_table_ids  = optional(list(string))
     private_route_table_ids = optional(list(string))
     private_subnet_ids      = optional(list(string))
     public_subnet_ids       = optional(list(string))
+    database_subnet_ids     = optional(list(string))
 
     single_nat_gateway           = bool
     create_database_subnet_group = bool

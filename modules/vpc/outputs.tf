@@ -3,19 +3,23 @@ output "vpc_id" {
 }
 
 output "vpc_cidr_block" {
-  value = var.create_vpc ? module.vpc[0].vpc_cidr_block : var.config.cidr
+  value = var.create_vpc ? module.vpc[0].vpc_cidr_block : var.config.vpc_cidr_block
 }
 
 output "public_subnets" {
-  value = var.create_vpc ? module.vpc[0].public_subnets : var.config.public_subnet_ids
+  value = var.create_vpc ? module.vpc[0].public_subnets : var.config.public_subnets
 }
 
 output "private_subnets" {
-  value = var.create_vpc ? module.vpc[0].private_subnets : var.config.private_subnet_ids
+  value = var.create_vpc ? module.vpc[0].private_subnets : var.config.private_subnets
+}
+
+output "database_subnets" {
+  value = var.create_vpc ? module.vpc[0].database_subnets : var.config.database_subnets
 }
 
 output "database_subnet_group" {
-  value = var.create_vpc ? module.vpc[0].database_subnet_group : var.config.db_subnet_group_name
+  value = var.create_vpc ? module.vpc[0].database_subnet_group : var.config.database_subnet_group
 }
 
 output "public_route_table_ids" {

@@ -23,6 +23,12 @@ output "secrets" {
   }
 }
 
+output "db" {
+  value = {
+    security_group_ids = local.db_enabled ? [module.rds_sg[0].security_group_id] : null
+  }
+}
+
 output "vpc" {
   value = {
     vpc_id                  = module.vpc.vpc_id
@@ -31,6 +37,7 @@ output "vpc" {
     private_route_table_ids = module.vpc.private_route_table_ids
     public_subnet_ids       = module.vpc.public_subnets
     private_subnet_ids      = module.vpc.private_subnets
+    database_subnet_ids     = module.vpc.database_subnets
     vpc_cidr_block          = module.vpc.vpc_cidr_block
   }
 }
