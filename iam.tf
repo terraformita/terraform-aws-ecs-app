@@ -41,18 +41,27 @@ data "aws_iam_policy_document" "execution_role_policy" {
     resources = ["*"]
   }
 
-  statement {
-    sid    = "AllowEFS"
-    effect = "Allow"
 
-    actions = [
-      "elasticfilesystem:ClientMount",
-      "elasticfilesystem:ClientWrite",
-      "elasticfilesystem:DescribeMountTargets",
-      "elasticfilesystem:DescribeFileSystems"
-    ]
+  # TODO: restrict to specific file system and access points
+  dynamic "statement" {
+    for_each = local.create_efs ? [1] : []
 
-    resources = ["*"]
+    content {
+      sid    = "AllowEFS"
+      effect = "Allow"
+
+      actions = [
+        "elasticfilesystem:ClientMount",
+        "elasticfilesystem:ClientWrite",
+        "elasticfilesystem:DescribeMountTargets",
+        "elasticfilesystem:DescribeFileSystems"
+      ]
+
+      resources = concat(
+        [aws_efs_file_system.efs_file_system[0].arn],
+        [for access_point in aws_efs_access_point.efs_file_system : access_point.arn]
+      )
+    }
   }
 
   statement {
