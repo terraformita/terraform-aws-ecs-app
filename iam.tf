@@ -41,8 +41,6 @@ data "aws_iam_policy_document" "execution_role_policy" {
     resources = ["*"]
   }
 
-
-  # TODO: restrict to specific file system and access points
   dynamic "statement" {
     for_each = local.create_efs ? [1] : []
 
