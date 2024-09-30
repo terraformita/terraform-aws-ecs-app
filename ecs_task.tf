@@ -68,7 +68,7 @@ resource "aws_ecs_task_definition" "app" {
     content {
       name = "efs_volume"
       efs_volume_configuration {
-        file_system_id     = aws_efs_file_system.efs_file_system.id
+        file_system_id     = aws_efs_file_system.efs_file_system[0].id
         transit_encryption = "ENABLED"
 
         authorization_config {

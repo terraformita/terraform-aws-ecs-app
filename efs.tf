@@ -1,4 +1,5 @@
 resource "aws_security_group" "efs_sg" {
+  count       = local.create_efs ? 1 : 0
   name        = "${local.stage_name}-efs-security-group"
   description = "Security group for Amazon EFS"
 
@@ -23,6 +24,7 @@ resource "aws_security_group" "efs_sg" {
 }
 
 resource "aws_efs_file_system" "efs_file_system" {
+  count            = local.create_efs ? 1 : 0
   performance_mode = "generalPurpose"
   throughput_mode  = "bursting"
   encrypted        = true
@@ -32,10 +34,10 @@ resource "aws_efs_file_system" "efs_file_system" {
 }
 
 resource "aws_efs_mount_target" "efs_mount_target" {
-  count           = length(module.vpc.private_subnets)
-  file_system_id  = aws_efs_file_system.efs_file_system.id
+  count           = local.create_efs ? length(module.vpc.private_subnets) : 0
+  file_system_id  = aws_efs_file_system.efs_file_system[0].id
   subnet_id       = module.vpc.private_subnets[count.index]
-  security_groups = [aws_security_group.efs_sg.id]
+  security_groups = [aws_security_group.efs_sg[0].id]
 }
 
 resource "aws_efs_access_point" "efs_file_system" {
@@ -44,7 +46,7 @@ resource "aws_efs_access_point" "efs_file_system" {
     container => config.disk_drive if config.disk_drive.enabled
   }
 
-  file_system_id = aws_efs_file_system.efs_file_system.id
+  file_system_id = aws_efs_file_system.efs_file_system[0].id
   posix_user {
     uid = each.value.uid
     gid = each.value.gid
