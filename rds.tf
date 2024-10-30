@@ -66,6 +66,7 @@ module "rds_sg" {
   }]
 
   egress_cidr_blocks = [module.vpc.vpc_cidr_block]
+  egress_rules       = ["all-all"]
 
   tags = local.tags
 }
