@@ -496,7 +496,7 @@ module "pre_signup_lambda" {
   tags  = local.tags
 
   function = {
-    name        = "${local.stage_name}-cognito-pre-signup"
+    name        = "cognito-pre-signup"
     description = "Pre-signup lambda for ${local.stage_name} app, that performs automatic verification of user's email and phone number."
 
     zip     = "${path.module}/lambda/pre-signup/pre_signup.js.zip"
