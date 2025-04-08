@@ -191,6 +191,7 @@ variable "database" {
     engine_version       = optional(string)
     major_engine_version = optional(string)
     db_parameters        = optional(map(string))
+    instance_type        = optional(string)
     storage_gb           = optional(number)
     multi_az             = optional(bool)
     log_exports          = optional(list(string))
