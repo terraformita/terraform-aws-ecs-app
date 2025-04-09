@@ -152,6 +152,18 @@ variable "domain_name" {
   type        = string
 }
 
+variable "zone_id" {
+  description = "ID of the Route53 zone where records will be created."
+  type        = string
+  default     = ""
+}
+
+variable "manage_dns" {
+  description = "Whether to manage Route53 DNS records."
+  type        = bool
+  default     = false
+}
+
 variable "deployment_strategy" {
   description = "Deployment strategy settings"
   type = object({
