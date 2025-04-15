@@ -241,3 +241,16 @@ variable "identity_providers" {
   }))
   default = {}
 }
+
+variable "log_retention_days" {
+  description = "Number of days to retain CloudWatch logs"
+  type        = number
+  nullable    = false
+  default     = 7
+}
+
+variable "kms_key_arn" {
+  description = "KMS key used to CloudWatch log data encryption"
+  type        = string
+  default     = null
+}
