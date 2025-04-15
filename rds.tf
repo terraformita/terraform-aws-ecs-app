@@ -99,10 +99,14 @@ module "db" {
   db_subnet_group_name   = module.vpc.database_subnet_group
   vpc_security_group_ids = [module.rds_sg[0].security_group_id]
 
-  maintenance_window              = "Mon:00:00-Mon:03:00"
-  backup_window                   = "03:00-06:00"
-  enabled_cloudwatch_logs_exports = local.db_log_exports
-  create_cloudwatch_log_group     = true
+  maintenance_window = "Mon:00:00-Mon:03:00"
+  backup_window      = "03:00-06:00"
+
+  create_cloudwatch_log_group            = true
+  enabled_cloudwatch_logs_exports        = local.db_log_exports
+  cloudwatch_log_group_retention_in_days = var.log_retention_days
+  cloudwatch_log_group_kms_key_id        = var.kms_key_arn
+
   blue_green_update = {
     enabled = false
   }

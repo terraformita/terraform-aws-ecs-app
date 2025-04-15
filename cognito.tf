@@ -441,7 +441,7 @@ data "archive_file" "auth_lambda" {
 module "auth_lambda" {
   for_each = local.auth_enabled_hosts
   source   = "terraformita/lambda/aws"
-  version  = "0.1.5"
+  version  = "0.2.3"
 
   stage = "${local.stage_name}-${each.key}"
   tags  = local.tags
@@ -470,6 +470,11 @@ module "auth_lambda" {
     }
   }
 
+  logs = {
+    log_retention_days = var.log_retention_days
+    kms_key_arn        = var.kms_key_arn
+  }
+
   layer = {
     zip                 = "${path.module}/lambda/userinfo/sdk-layer.zip"
     compatible_runtimes = ["python3.8"]
@@ -490,7 +495,7 @@ data "archive_file" "pre_signup_lambda" {
 
 module "pre_signup_lambda" {
   source  = "terraformita/lambda/aws"
-  version = "0.1.5"
+  version = "0.2.3"
 
   stage = local.stage_name
   tags  = local.tags
@@ -503,11 +508,16 @@ module "pre_signup_lambda" {
     handler = "index.handler"
     runtime = "nodejs16.x"
     memsize = "128"
-
-    depends_on = [
-      data.archive_file.pre_signup_lambda
-    ]
   }
+
+  logs = {
+    log_retention_days = var.log_retention_days
+    kms_key_arn        = var.kms_key_arn
+  }
+
+  depends_on = [
+    data.archive_file.pre_signup_lambda
+  ]
 }
 
 resource "aws_lambda_permission" "user_pool" {

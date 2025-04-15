@@ -7,7 +7,10 @@ resource "aws_ecs_account_setting_default" "vpc_trunking" {
 #### CONTAINER LOG GROUPS
 resource "aws_cloudwatch_log_group" "container" {
   for_each = local.app_containers_map
-  name     = "/ecs/${local.stage_name}-${each.key}"
+
+  name              = "/ecs/${local.stage_name}-${each.key}"
+  retention_in_days = var.log_retention_days
+  kms_key_id        = var.kms_key_arn
 }
 
 ################################################################################
