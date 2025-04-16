@@ -239,14 +239,14 @@ module "ecs_alb" {
   security_group_ingress_rules = {
     all_http = {
       from_port   = 80
-      to_port     = 82
+      to_port     = 80
       ip_protocol = "tcp"
       description = "HTTP traffic"
       cidr_ipv4   = "0.0.0.0/0"
     }
     all_https = {
       from_port   = 443
-      to_port     = 445
+      to_port     = 443
       ip_protocol = "tcp"
       description = "HTTPS traffic"
       cidr_ipv4   = "0.0.0.0/0"
@@ -312,20 +312,6 @@ module "ecs_alb" {
   }
 
   target_groups = local.balancer_target_groups[each.key]
-
-  # Route53 Record(s)
-  # route53_records = {
-  #   A = {
-  #     name    = local.name
-  #     type    = "A"
-  #     zone_id = data.aws_route53_zone.this.id
-  #   }
-  #   AAAA = {
-  #     name    = local.name
-  #     type    = "AAAA"
-  #     zone_id = data.aws_route53_zone.this.id
-  #   }
-  # }
 
   tags = merge(local.tags,
     { Name = "${local.stage_name}-ecs-alb-${each.value}" }
