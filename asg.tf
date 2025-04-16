@@ -95,9 +95,14 @@ module "autoscaling" {
   desired_capacity    = var.autoscaling_instances.desired
 
   # https://github.com/hashicorp/terraform-provider-aws/issues/12582
-  autoscaling_group_tags = {
-    AmazonECSManaged = true
-  }
+  autoscaling_group_tags = merge(
+    {
+      AmazonECSManaged = true
+    },
+    var.autoscaling_group_tags
+  )
+
+  tag_specifications = var.lt_tag_specifications
 
   # Required for managed_termination_protection = "ENABLED"
   protect_from_scale_in = true
