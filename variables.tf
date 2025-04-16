@@ -267,8 +267,14 @@ variable "lt_tag_specifications" {
   default     = []
 }
 
-variable "cognito_pre_signup_reserved_concurrency" {
+variable "cognito_lambda_reserved_concurrency" {
   description = "Reserved concurrency for the cognito pre-signup lambda."
   type        = number
   default     = -1
+}
+
+variable "lambda_shared_dlq" {
+  description = "ARN of the Dead Letter Queue (SQS or SNS) for lambdas."
+  type        = string
+  default     = null
 }

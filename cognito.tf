@@ -440,8 +440,9 @@ data "archive_file" "auth_lambda" {
 
 module "auth_lambda" {
   for_each = local.auth_enabled_hosts
-  source   = "terraformita/lambda/aws"
-  version  = "0.2.3"
+
+  source  = "terraformita/lambda/aws"
+  version = "0.2.6"
 
   stage = "${local.stage_name}-${each.key}"
   tags  = local.tags
@@ -454,6 +455,9 @@ module "auth_lambda" {
     handler = "lambda_handler.lambda_handler"
     runtime = "python3.8"
     memsize = "256"
+
+    reserved_concurrency = var.cognito_lambda_reserved_concurrency
+    dead_letter_config   = var.lambda_shared_dlq
 
     track_versions = true
 
@@ -468,6 +472,22 @@ module "auth_lambda" {
       REGION               = var.region
       RETURN_URI           = "https://${each.key}.${var.domain_name}"
     }
+
+    policies = var.lambda_shared_dlq != null ? {
+      dlq-publish = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+          {
+            Effect = "Allow"
+            Action = [
+              "sqs:SendMessage",
+              "sqs:GetQueueAttributes"
+            ]
+            Resource = var.lambda_shared_dlq
+          }
+        ]
+      })
+    } : {}
   }
 
   logs = {
@@ -495,7 +515,7 @@ data "archive_file" "pre_signup_lambda" {
 
 module "pre_signup_lambda" {
   source  = "terraformita/lambda/aws"
-  version = "0.2.3"
+  version = "0.2.6"
 
   stage = local.stage_name
   tags  = local.tags
@@ -509,7 +529,24 @@ module "pre_signup_lambda" {
     runtime = "nodejs16.x"
     memsize = 128
 
-    reserved_concurrency = var.cognito_pre_signup_reserved_concurrency
+    reserved_concurrency = var.cognito_lambda_reserved_concurrency
+    dead_letter_config   = var.lambda_shared_dlq
+
+    policies = var.lambda_shared_dlq != null ? {
+      dlq-publish = jsonencode({
+        Version = "2012-10-17"
+        Statement = [
+          {
+            Effect = "Allow"
+            Action = [
+              "sqs:SendMessage",
+              "sqs:GetQueueAttributes"
+            ]
+            Resource = var.lambda_shared_dlq
+          }
+        ]
+      })
+    } : {}
   }
 
   logs = {
