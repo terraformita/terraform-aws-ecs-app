@@ -243,14 +243,32 @@ variable "identity_providers" {
 }
 
 variable "log_retention_days" {
-  description = "Number of days to retain CloudWatch logs"
+  description = "Number of days to retain CloudWatch logs."
   type        = number
   nullable    = false
   default     = 7
 }
 
 variable "kms_key_arn" {
-  description = "KMS key used to CloudWatch log data encryption"
+  description = "KMS key used to CloudWatch log data encryption."
   type        = string
   default     = null
+}
+
+variable "autoscaling_group_tags" {
+  description = "A map of additional tags to add to the autoscaling group."
+  type        = map(string)
+  default     = {}
+}
+
+variable "lt_tag_specifications" {
+  description = "The tags to apply to the launch template resources during launch."
+  type        = list(any)
+  default     = []
+}
+
+variable "cognito_pre_signup_reserved_concurrency" {
+  description = "Reserved concurrency for the cognito pre-signup lambda."
+  type        = number
+  default     = -1
 }

@@ -507,7 +507,9 @@ module "pre_signup_lambda" {
     zip     = "${path.module}/lambda/pre-signup/pre_signup.js.zip"
     handler = "index.handler"
     runtime = "nodejs16.x"
-    memsize = "128"
+    memsize = 128
+
+    reserved_concurrency = var.cognito_pre_signup_reserved_concurrency
   }
 
   logs = {
