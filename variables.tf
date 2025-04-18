@@ -137,7 +137,6 @@ variable "containers" {
       refresh_token_validity = optional(number, 1440)
       access_token_validity  = optional(number, 60)
       id_token_validity      = optional(number, 60)
-
     }))
   }))
 }
@@ -196,18 +195,22 @@ variable "access_logs_bucket_id" {
 variable "database" {
   description = "Configuration of the main application database"
   type = object({
-    db_name              = optional(string)
-    port                 = optional(number)
-    user                 = optional(string)
-    engine               = optional(string)
-    engine_version       = optional(string)
-    major_engine_version = optional(string)
-    db_parameters        = optional(map(string))
-    instance_type        = optional(string)
-    storage_gb           = optional(number)
-    multi_az             = optional(bool)
-    log_exports          = optional(list(string))
-    enforce_ssl          = optional(bool, true)
+    db_name               = optional(string)
+    port                  = optional(number)
+    user                  = optional(string)
+    engine                = optional(string)
+    engine_version        = optional(string)
+    major_engine_version  = optional(string)
+    family                = optional(string, null)
+    db_parameters         = optional(map(string))
+    instance_type         = optional(string)
+    storage_gb            = optional(number)
+    multi_az              = optional(bool)
+    log_exports           = optional(list(string))
+    enforce_ssl           = optional(bool, true)
+    iam_auth              = optional(bool, false)
+    copy_tags_to_snapshot = optional(bool, false)
+    apply_immediately     = optional(bool, false)
   })
 
   default  = null
