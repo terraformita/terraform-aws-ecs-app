@@ -17,10 +17,11 @@ locals {
   db_storage_gb           = try(var.database.storage_gb, null) == null ? 20 : var.database.storage_gb
   db_multi_az             = try(var.database.multi_az, null) == null ? false : var.database.multi_az
   db_instance_type        = try(var.database.instance_type, null) == null ? "db.t3.micro" : var.database.instance_type
-  db_parameters_family    = try(var.database.parameters_family, null) == null ? null : var.database.parameters_family
+  db_family               = try(var.database.family, null) == null ? null : var.database.family
   db_enforce_ssl          = try(var.database.enforce_ssl, true)
   db_parameters = try(var.database.db_parameters, null) == null ? [] : [
-    for name, value in var.database.db_parameters : {
+    for name, value in var.database.db_parameters :
+    {
       name  = name
       value = value
     }
@@ -81,11 +82,11 @@ module "db" {
   # All available versions: http://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_MySQL.html#MySQL.Concepts.VersionMgmt
   engine               = local.db_engine
   engine_version       = local.db_engine_version
-  family               = local.db_parameters_family    # "${local.db_engine}${local.db_engine_version}" # DB parameter group
+  family               = local.db_family               # "${local.db_engine}${local.db_engine_version}" # DB parameter group
   major_engine_version = local.db_major_engine_version # DB option group
   instance_class       = local.db_instance_type
 
-  create_db_parameter_group = local.db_parameters_family != null
+  create_db_parameter_group = local.db_family != null
 
   allocated_storage     = local.db_storage_gb
   max_allocated_storage = local.db_storage_gb * 5
@@ -95,7 +96,6 @@ module "db" {
   password = random_password.db_password[0].result
   port     = local.db_port
 
-  multi_az               = var.database.multi_az
   db_subnet_group_name   = module.vpc.database_subnet_group
   vpc_security_group_ids = [module.rds_sg[0].security_group_id]
 
@@ -106,6 +106,11 @@ module "db" {
   enabled_cloudwatch_logs_exports        = local.db_log_exports
   cloudwatch_log_group_retention_in_days = var.log_retention_days
   cloudwatch_log_group_kms_key_id        = var.kms_key_arn
+
+  multi_az                            = var.database.multi_az
+  iam_database_authentication_enabled = var.database.iam_auth
+  copy_tags_to_snapshot               = var.database.copy_tags_to_snapshot
+  apply_immediately                   = var.database.apply_immediately
 
   blue_green_update = {
     enabled = false
