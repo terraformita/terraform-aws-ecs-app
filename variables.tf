@@ -6,12 +6,12 @@ variable "stage_name" {
 variable "vpc" {
   description = "Object containing all VPC information to create"
   type = object({
-    vpc_id                  = optional(string)
-    db_subnet_group_name    = optional(string)
-    public_route_table_ids  = optional(list(string))
-    private_route_table_ids = optional(list(string))
-    public_subnet_ids       = optional(list(string))
-    private_subnet_ids      = optional(list(string))
+    vpc_id                     = optional(string)
+    database_subnet_group_name = optional(string)
+    public_route_table_ids     = optional(list(string))
+    private_route_table_ids    = optional(list(string))
+    public_subnet_ids          = optional(list(string))
+    private_subnet_ids         = optional(list(string))
 
     vpc_cidr_block   = string
     azs              = optional(list(string))

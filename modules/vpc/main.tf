@@ -10,6 +10,8 @@ module "vpc" {
   private_subnets  = var.config.private_subnets
   database_subnets = var.config.database_subnets
 
+  database_subnet_group_name = var.config.database_subnet_group_name
+
   single_nat_gateway           = var.config.single_nat_gateway
   create_database_subnet_group = var.config.create_database_subnet_group
 
