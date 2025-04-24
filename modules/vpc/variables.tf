@@ -7,13 +7,13 @@ variable "config" {
     private_subnets  = optional(list(string))
     database_subnets = optional(list(string))
 
-    vpc_id                  = optional(string)
-    database_subnet_group   = optional(string)
-    public_route_table_ids  = optional(list(string))
-    private_route_table_ids = optional(list(string))
-    private_subnet_ids      = optional(list(string))
-    public_subnet_ids       = optional(list(string))
-    database_subnet_ids     = optional(list(string))
+    vpc_id                     = optional(string)
+    database_subnet_group_name = optional(string)
+    public_route_table_ids     = optional(list(string))
+    private_route_table_ids    = optional(list(string))
+    private_subnet_ids         = optional(list(string))
+    public_subnet_ids          = optional(list(string))
+    database_subnet_ids        = optional(list(string))
 
     single_nat_gateway           = bool
     create_database_subnet_group = bool

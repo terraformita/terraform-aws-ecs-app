@@ -31,13 +31,13 @@ output "db" {
 
 output "vpc" {
   value = {
-    vpc_id                  = module.vpc.vpc_id
-    db_subnet_group_name    = module.vpc.database_subnet_group
-    public_route_table_ids  = module.vpc.public_route_table_ids
-    private_route_table_ids = module.vpc.private_route_table_ids
-    public_subnet_ids       = module.vpc.public_subnets
-    private_subnet_ids      = module.vpc.private_subnets
-    database_subnet_ids     = module.vpc.database_subnets
-    vpc_cidr_block          = module.vpc.vpc_cidr_block
+    vpc_id                     = module.vpc.vpc_id
+    database_subnet_group_name = module.vpc.database_subnet_group_name
+    public_route_table_ids     = module.vpc.public_route_table_ids
+    private_route_table_ids    = module.vpc.private_route_table_ids
+    public_subnet_ids          = module.vpc.public_subnets
+    private_subnet_ids         = module.vpc.private_subnets
+    database_subnet_ids        = module.vpc.database_subnets
+    vpc_cidr_block             = module.vpc.vpc_cidr_block
   }
 }

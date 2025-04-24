@@ -18,8 +18,8 @@ output "database_subnets" {
   value = var.create_vpc ? module.vpc[0].database_subnets : var.config.database_subnets
 }
 
-output "database_subnet_group" {
-  value = var.create_vpc ? module.vpc[0].database_subnet_group : var.config.database_subnet_group
+output "database_subnet_group_name" {
+  value = var.create_vpc ? module.vpc[0].database_subnet_group_name : var.config.database_subnet_group_name
 }
 
 output "public_route_table_ids" {
