@@ -75,7 +75,7 @@ module "rds_sg" {
 module "db" {
   count   = local.db_enabled ? 1 : 0
   source  = "terraform-aws-modules/rds/aws"
-  version = "5.4.2"
+  version = "6.12.0"
 
   identifier = local.stage_name
 
@@ -124,7 +124,6 @@ module "db" {
   create_monitoring_role                = true
   monitoring_role_name                  = "${local.stage_name}-rds-monitoring-role"
   monitoring_interval                   = 60
-  create_random_password                = false
 
   parameters = local.db_parameters
 

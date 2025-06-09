@@ -3,6 +3,7 @@ output "ecs" {
     exec_role  = aws_iam_role.execution_role
     task_roles = aws_iam_role.task_role
     services   = aws_ecs_service.app
+    asg_name   = module.autoscaling["ecs"].autoscaling_group_name
   }
 }
 
