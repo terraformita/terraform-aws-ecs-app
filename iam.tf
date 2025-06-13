@@ -14,6 +14,28 @@ resource "aws_iam_role" "execution_role" {
   })
 }
 
+locals {
+  all_ssm_params_map = {
+    for pair in flatten([
+      for k, v in local.app_containers_map : [
+        for name in v.ssm_params : {
+          key   = "${k}_${replace(replace(name, "/", "_"), "-", "_")}"
+          value = name
+        }
+      ]
+    ]) : pair.key => pair.value
+  }
+}
+
+data "aws_ssm_parameter" "params" {
+  for_each = local.all_ssm_params_map
+  name     = each.value
+}
+
+locals {
+  all_ssm_parameters = [for param in data.aws_ssm_parameter.params : param.arn]
+}
+
 data "aws_iam_policy_document" "execution_role_policy" {
   version = "2012-10-17"
 
@@ -90,6 +112,18 @@ data "aws_iam_policy_document" "execution_role_policy" {
       aws_secretsmanager_secret.app_vars.arn,
       aws_secretsmanager_secret.db_credentials.arn
     ]
+  }
+
+  statement {
+    sid    = "ReadSSMParameters"
+    effect = "Allow"
+
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters"
+    ]
+
+    resources = local.all_ssm_parameters
   }
 
   dynamic "statement" {
@@ -203,6 +237,18 @@ data "aws_iam_policy_document" "task_role_policy" {
         for bucket in each.value.accessible_cloud_storage : "${bucket}/*"
       ]
     }
+  }
+
+  statement {
+    sid    = "ReadSSMParameters"
+    effect = "Allow"
+
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters"
+    ]
+
+    resources = local.all_ssm_parameters
   }
 
   dynamic "statement" {

@@ -111,6 +111,7 @@ variable "containers" {
     env_vars    = optional(map(string))
     env_files   = optional(map(string))
     secret_vars = optional(map(string), {})
+    ssm_params  = optional(list(string), [])
     disk_drive = optional(object({
       enabled = optional(bool, false)
       size_gb = optional(number, 10)
