@@ -34,10 +34,16 @@ data "aws_ssm_parameter" "params" {
 
 locals {
   all_ssm_parameters = [for param in data.aws_ssm_parameter.params : param.arn]
+  extended_execution_policies = [
+    for name, container in local.app_containers_map : container.execution_role_policy_extended
+    if container.execution_role_policy_extended != null #&& container.execution_role_policy_extended != ""
+  ]
 }
 
 data "aws_iam_policy_document" "execution_role_policy" {
   version = "2012-10-17"
+
+  source_policy_documents = local.extended_execution_policies
 
   statement {
     sid    = "AllowECRPull"
