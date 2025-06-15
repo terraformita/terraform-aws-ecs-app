@@ -96,6 +96,8 @@ module "db" {
   password = random_password.db_password[0].result
   port     = local.db_port
 
+  manage_master_user_password = false
+
   db_subnet_group_name   = module.vpc.database_subnet_group_name
   vpc_security_group_ids = [module.rds_sg[0].security_group_id]
 
