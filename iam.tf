@@ -36,7 +36,11 @@ locals {
   all_ssm_parameters = [for param in data.aws_ssm_parameter.params : param.arn]
   extended_execution_policies = [
     for name, container in local.app_containers_map : container.execution_role_policy_extended
-    if container.execution_role_policy_extended != null #&& container.execution_role_policy_extended != ""
+    if container.execution_role_policy_extended != null
+  ]
+  extended_task_policies = [
+    for name, container in local.app_containers_map : container.task_role_policy_extended
+    if container.task_role_policy_extended != null
   ]
 }
 
@@ -52,7 +56,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
     actions = [
       "ecr:GetDownloadUrlForLayer",
       "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability",
+      "ecr:BatchCheckLayerAvailability"
     ]
 
     resources = [for repo in aws_ecr_repository.container_repository : repo.arn]
@@ -63,7 +67,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
     effect = "Allow"
 
     actions = [
-      "ecr:GetAuthorizationToken",
+      "ecr:GetAuthorizationToken"
     ]
 
     resources = ["*"]
@@ -96,7 +100,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
 
     actions = [
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
+      "logs:PutLogEvents"
     ]
 
     resources = concat([
@@ -111,7 +115,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
     effect = "Allow"
 
     actions = [
-      "secretsmanager:GetSecretValue",
+      "secretsmanager:GetSecretValue"
     ]
 
     resources = [
@@ -141,7 +145,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
 
       actions = [
         "ssm:GetParameters",
-        "ssm:GetParameter",
+        "ssm:GetParameter"
       ]
 
       resources = [
@@ -175,18 +179,21 @@ resource "aws_iam_role" "task_role" {
 
 data "aws_iam_policy_document" "task_role_policy" {
   for_each = local.app_containers_map
-  version  = "2012-10-17"
+
+  version = "2012-10-17"
+
+  source_policy_documents = local.extended_task_policies
 
   statement {
     sid    = "AllowDescribeCluster"
     effect = "Allow"
 
     actions = [
-      "ecs:DescribeClusters",
+      "ecs:DescribeClusters"
     ]
 
     resources = [
-      local.ecs_cluster_arn,
+      local.ecs_cluster_arn
     ]
   }
 
@@ -196,7 +203,7 @@ data "aws_iam_policy_document" "task_role_policy" {
 
     actions = [
       "logs:CreateLogStream",
-      "logs:PutLogEvents",
+      "logs:PutLogEvents"
     ]
 
     resources = concat([
@@ -216,7 +223,7 @@ data "aws_iam_policy_document" "task_role_policy" {
       actions = [
         "s3:GetBucketList",
         "s3:GetBucketLocation",
-        "s3:ListBucketMultipartUploads",
+        "s3:ListBucketMultipartUploads"
       ]
 
       resources = [
@@ -236,7 +243,7 @@ data "aws_iam_policy_document" "task_role_policy" {
         "s3:GetObject",
         "s3:PutObject",
         "s3:ListMultipartUploadParts",
-        "s3:AbortMultipartUpload",
+        "s3:AbortMultipartUpload"
       ]
 
       resources = [
@@ -269,7 +276,7 @@ data "aws_iam_policy_document" "task_role_policy" {
 
       actions = [
         "ssm:GetParameters",
-        "ssm:GetParameter",
+        "ssm:GetParameter"
       ]
 
       resources = [
