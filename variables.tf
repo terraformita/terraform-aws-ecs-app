@@ -129,6 +129,8 @@ variable "containers" {
 
     accessible_cloud_storage = optional(list(string), [])
 
+    execution_role_policy_extended = optional(string)
+
     user_auth = optional(object({
       automated = optional(bool, true)
 
