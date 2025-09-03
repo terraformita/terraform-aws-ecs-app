@@ -17,6 +17,8 @@ resource "aws_iam_role" "execution_role" {
 data "aws_iam_policy_document" "execution_role_policy" {
   version = "2012-10-17"
 
+  source_policy_documents = local.extended_execution_policies
+
   statement {
     sid    = "AllowECRPull"
     effect = "Allow"
@@ -112,6 +114,18 @@ data "aws_iam_policy_document" "execution_role_policy" {
   }
 }
 
+locals {
+  extended_execution_policies = [
+    for name, container in local.app_containers_map : container.execution_role_policy_extended
+    if container.execution_role_policy_extended != null
+  ]
+
+  extended_task_policies = {
+    for name, container in local.app_containers_map : name => [container.task_role_policy_extended]
+    if container.task_role_policy_extended != null
+  }
+}
+
 resource "aws_iam_role_policy" "execution_role" {
   role   = aws_iam_role.execution_role.name
   policy = data.aws_iam_policy_document.execution_role_policy.json
@@ -136,6 +150,8 @@ resource "aws_iam_role" "task_role" {
 data "aws_iam_policy_document" "task_role_policy" {
   for_each = local.app_containers_map
   version  = "2012-10-17"
+
+  source_policy_documents = try(local.extended_task_policies[each.key], [])
 
   statement {
     sid    = "AllowDescribeCluster"
