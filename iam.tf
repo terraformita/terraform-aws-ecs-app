@@ -33,7 +33,7 @@ data "aws_ssm_parameter" "params" {
 }
 
 locals {
-  all_ssm_parameters = [for param in data.aws_ssm_parameter.params : param.arn]
+  all_ssm_parameters = [for param in data.aws_ssm_parameter.params : param.arn if param.arn != null && param.arn != ""]
   extended_execution_policies = [
     for name, container in local.app_containers_map : container.execution_role_policy_extended
     if container.execution_role_policy_extended != null
@@ -124,16 +124,20 @@ data "aws_iam_policy_document" "execution_role_policy" {
     ]
   }
 
-  statement {
-    sid    = "ReadSSMParameters"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = length(local.all_ssm_parameters) > 0 ? [1] : []
 
-    actions = [
-      "ssm:GetParameter",
-      "ssm:GetParameters"
-    ]
+    content {
+      sid    = "ReadSSMParameters"
+      effect = "Allow"
 
-    resources = local.all_ssm_parameters
+      actions = [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ]
+
+      resources = local.all_ssm_parameters
+    }
   }
 
   dynamic "statement" {
@@ -252,16 +256,20 @@ data "aws_iam_policy_document" "task_role_policy" {
     }
   }
 
-  statement {
-    sid    = "ReadSSMParameters"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = length(local.all_ssm_parameters) > 0 ? [1] : []
 
-    actions = [
-      "ssm:GetParameter",
-      "ssm:GetParameters"
-    ]
+    content {
+      sid    = "ReadSSMParameters"
+      effect = "Allow"
 
-    resources = local.all_ssm_parameters
+      actions = [
+        "ssm:GetParameter",
+        "ssm:GetParameters"
+      ]
+
+      resources = local.all_ssm_parameters
+    }
   }
 
   dynamic "statement" {
