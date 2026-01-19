@@ -5,13 +5,14 @@ locals {
 
   # Build full DB connection URL
   # Example:
-  #   "postgresql://user:pass@host/dbname?sslmode=require"
+  #   "postgresql://user:pass@host:port/dbname?sslmode=require"
   db_url = local.db_enabled ? format(
-    "%s://%s:%s@%s/%s%s",
+    "%s://%s:%s@%s:%s/%s%s",
     local.db_proto[local.db_engine],       # Example: "postgresql"
     local.db_user,                         # Example: "appuser"
     random_password.db_password[0].result, # Example: "p@ssw0rd"
     module.db[0].db_instance_address,      # Example: "db.cluster.amazonaws.com"
+    module.db[0].db_instance_port,         # Example: "5432"
     local.db_name,                         # Example: "mydb"
     local.db_sslmode
   ) : ""
