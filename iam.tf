@@ -38,10 +38,6 @@ locals {
     for name, container in local.app_containers_map : container.execution_role_policy_extended
     if container.execution_role_policy_extended != null
   ]
-  extended_task_policies = [
-    for name, container in local.app_containers_map : container.task_role_policy_extended
-    if container.task_role_policy_extended != null
-  ]
 }
 
 data "aws_iam_policy_document" "execution_role_policy" {
@@ -186,7 +182,7 @@ data "aws_iam_policy_document" "task_role_policy" {
 
   version = "2012-10-17"
 
-  source_policy_documents = local.extended_task_policies
+  source_policy_documents = compact([each.value.task_role_policy_extended])
 
   statement {
     sid    = "AllowDescribeCluster"
