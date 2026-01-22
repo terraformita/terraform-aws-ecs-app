@@ -442,7 +442,7 @@ module "auth_lambda" {
   for_each = local.auth_enabled_hosts
 
   source  = "terraformita/lambda/aws"
-  version = "0.2.6"
+  version = "0.2.7"
 
   stage = "${local.stage_name}-${each.key}"
   tags  = local.tags
@@ -515,7 +515,7 @@ data "archive_file" "pre_signup_lambda" {
 
 module "pre_signup_lambda" {
   source  = "terraformita/lambda/aws"
-  version = "0.2.6"
+  version = "0.2.7"
 
   stage = local.stage_name
   tags  = local.tags
