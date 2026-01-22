@@ -156,9 +156,14 @@ data "aws_iam_policy_document" "execution_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "execution_role" {
-  role   = aws_iam_role.execution_role.name
+resource "aws_iam_policy" "execution_role" {
+  name   = "${local.stage_name}-ecs-exec-role-policy"
   policy = data.aws_iam_policy_document.execution_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "execution_role" {
+  role       = aws_iam_role.execution_role.name
+  policy_arn = aws_iam_policy.execution_role.arn
 }
 
 resource "aws_iam_role" "task_role" {
@@ -291,10 +296,16 @@ data "aws_iam_policy_document" "task_role_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "task_role" {
+resource "aws_iam_policy" "task_role" {
   for_each = local.app_containers_map
-  role     = aws_iam_role.task_role[each.key].name
+  name     = "${local.stage_name}-ecs-task-role-${each.key}-policy"
   policy   = data.aws_iam_policy_document.task_role_policy[each.key].json
+}
+
+resource "aws_iam_role_policy_attachment" "task_role" {
+  for_each   = local.app_containers_map
+  role       = aws_iam_role.task_role[each.key].name
+  policy_arn = aws_iam_policy.task_role[each.key].arn
 }
 
 #### COGNITO USER POOL ROLE
@@ -317,9 +328,8 @@ resource "aws_iam_role" "user_pool" {
   })
 }
 
-resource "aws_iam_role_policy" "cognito_send_sms" {
+resource "aws_iam_policy" "cognito_send_sms" {
   name = "${local.stage_name}-cognito-send-sms"
-  role = aws_iam_role.user_pool.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -328,4 +338,9 @@ resource "aws_iam_role_policy" "cognito_send_sms" {
       Resource = "*"
     }]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "cognito_send_sms" {
+  role       = aws_iam_role.user_pool.id
+  policy_arn = aws_iam_policy.cognito_send_sms.arn
 }
