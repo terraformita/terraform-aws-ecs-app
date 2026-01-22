@@ -430,6 +430,22 @@ resource "aws_cognito_user_pool_client" "host_based" {
   ]
 }
 
+resource "aws_security_group" "cognito_lambdas" {
+  name        = "${local.stage_name}-cognito-lambdas"
+  description = "Security group for Cognito Lambda"
+  vpc_id      = module.vpc.vpc_id
+
+  egress {
+    description = "Allow HTTPS"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
 ## AUTH LAMBDA
 data "archive_file" "auth_lambda" {
   type = "zip"
@@ -442,7 +458,7 @@ module "auth_lambda" {
   for_each = local.auth_enabled_hosts
 
   source  = "terraformita/lambda/aws"
-  version = "0.2.7"
+  version = "0.2.8"
 
   stage = "${local.stage_name}-${each.key}"
   tags  = local.tags
@@ -458,6 +474,12 @@ module "auth_lambda" {
 
     reserved_concurrency = var.cognito_lambda_reserved_concurrency
     dead_letter_config   = var.lambda_shared_dlq
+
+    vpc_config = {
+      vpc_id          = module.vpc.vpc_id
+      subnet_ids      = module.vpc.private_subnets
+      security_groups = [aws_security_group.cognito_lambdas.id]
+    }
 
     track_versions = true
 
@@ -515,7 +537,7 @@ data "archive_file" "pre_signup_lambda" {
 
 module "pre_signup_lambda" {
   source  = "terraformita/lambda/aws"
-  version = "0.2.7"
+  version = "0.2.8"
 
   stage = local.stage_name
   tags  = local.tags
@@ -531,6 +553,12 @@ module "pre_signup_lambda" {
 
     reserved_concurrency = var.cognito_lambda_reserved_concurrency
     dead_letter_config   = var.lambda_shared_dlq
+
+    vpc_config = {
+      vpc_id          = module.vpc.vpc_id
+      subnet_ids      = module.vpc.private_subnets
+      security_groups = [aws_security_group.cognito_lambdas.id]
+    }
 
     policies = var.lambda_shared_dlq != null ? {
       dlq-publish = jsonencode({
