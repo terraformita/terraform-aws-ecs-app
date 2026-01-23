@@ -142,6 +142,11 @@ variable "containers" {
       access_token_validity  = optional(number, 60)
       id_token_validity      = optional(number, 60)
     }))
+
+    autoscaling_thresholds = optional(object({
+      cpu    = optional(number)
+      memory = optional(number)
+    }), {})
   }))
 }
 
