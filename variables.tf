@@ -43,14 +43,14 @@ variable "autoscaling_thresholds" {
   type = object({
     cpu                = number
     memory             = number
-    scale_in_cooldown  = optional(number, 300)
-    scale_out_cooldown = optional(number, 300)
+    scale_in_cooldown  = optional(number, 0)
+    scale_out_cooldown = optional(number, 0)
   })
   default = {
     cpu                = 80
     memory             = 90
-    scale_in_cooldown  = 300
-    scale_out_cooldown = 300
+    scale_in_cooldown  = 0
+    scale_out_cooldown = 0
   }
 }
 
