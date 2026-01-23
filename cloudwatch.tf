@@ -8,7 +8,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization_high" {
   namespace           = "AWS/ECS"
   period              = 60
   statistic           = "Average"
-  threshold           = var.autoscaling_thresholds.cpu
+  threshold           = coalesce(each.value.autoscaling_thresholds.cpu, var.autoscaling_thresholds.cpu)
 
   dimensions = {
     ClusterName = local.ecs_cluster_name
@@ -33,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "memory_utilization_high" {
   namespace           = "AWS/ECS"
   period              = 60
   statistic           = "Average"
-  threshold           = var.autoscaling_thresholds.memory
+  threshold           = coalesce(each.value.autoscaling_thresholds.memory, var.autoscaling_thresholds.memory)
 
   dimensions = {
     ClusterName = local.ecs_cluster_name

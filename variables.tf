@@ -39,15 +39,18 @@ variable "autoscaling_instances" {
 }
 
 variable "autoscaling_thresholds" {
-  description = "Values for scaling thresholds"
+  description = "Default Autoscaling Thresholds"
   type = object({
-    cpu    = number
-    memory = number
+    cpu                = number
+    memory             = number
+    scale_in_cooldown  = optional(number, 0)
+    scale_out_cooldown = optional(number, 0)
   })
-
   default = {
-    cpu    = 80
-    memory = 90
+    cpu                = 80
+    memory             = 90
+    scale_in_cooldown  = 0
+    scale_out_cooldown = 0
   }
 }
 
@@ -142,6 +145,13 @@ variable "containers" {
       access_token_validity  = optional(number, 60)
       id_token_validity      = optional(number, 60)
     }))
+
+    autoscaling_thresholds = optional(object({
+      cpu                = optional(number)
+      memory             = optional(number)
+      scale_in_cooldown  = optional(number)
+      scale_out_cooldown = optional(number)
+    }), {})
   }))
 }
 
