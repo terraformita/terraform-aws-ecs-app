@@ -75,7 +75,7 @@ resource "aws_appautoscaling_target" "service" {
   for_each           = local.app_containers_map
   max_capacity       = var.autoscaling_instances.max
   min_capacity       = var.autoscaling_instances.min
-  resource_id        = "service/${local.ecs_cluster_id}/${aws_ecs_service.app[each.key].name}"
+  resource_id        = "service/${local.ecs_cluster_name}/${aws_ecs_service.app[each.key].name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
 }
