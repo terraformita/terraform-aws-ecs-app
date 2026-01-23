@@ -88,7 +88,9 @@ resource "aws_appautoscaling_policy" "cpu_threshold" {
   scalable_dimension = aws_appautoscaling_target.service[each.key].scalable_dimension
   service_namespace  = aws_appautoscaling_target.service[each.key].service_namespace
   target_tracking_scaling_policy_configuration {
-    target_value = coalesce(each.value.autoscaling_thresholds.cpu, var.autoscaling_thresholds.cpu)
+    target_value       = coalesce(each.value.autoscaling_thresholds.cpu, var.autoscaling_thresholds.cpu)
+    scale_in_cooldown  = coalesce(each.value.autoscaling_thresholds.scale_in_cooldown, var.autoscaling_thresholds.scale_in_cooldown)
+    scale_out_cooldown = coalesce(each.value.autoscaling_thresholds.scale_out_cooldown, var.autoscaling_thresholds.scale_out_cooldown)
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
@@ -103,7 +105,9 @@ resource "aws_appautoscaling_policy" "memory_threshold" {
   scalable_dimension = aws_appautoscaling_target.service[each.key].scalable_dimension
   service_namespace  = aws_appautoscaling_target.service[each.key].service_namespace
   target_tracking_scaling_policy_configuration {
-    target_value = coalesce(each.value.autoscaling_thresholds.memory, var.autoscaling_thresholds.memory)
+    target_value       = coalesce(each.value.autoscaling_thresholds.memory, var.autoscaling_thresholds.memory)
+    scale_in_cooldown  = coalesce(each.value.autoscaling_thresholds.scale_in_cooldown, var.autoscaling_thresholds.scale_in_cooldown)
+    scale_out_cooldown = coalesce(each.value.autoscaling_thresholds.scale_out_cooldown, var.autoscaling_thresholds.scale_out_cooldown)
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
