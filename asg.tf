@@ -88,6 +88,14 @@ module "autoscaling" {
     hostname_type                     = "ip-name"
   }
 
+  update_default_version = true
+
+  metadata_options = {
+    http_endpoint          = "enabled"
+    http_tokens            = "required"
+    instance_metadata_tags = "enabled"
+  }
+
   vpc_zone_identifier = module.vpc.private_subnets
   health_check_type   = "EC2"
   min_size            = var.autoscaling_instances.min
