@@ -51,9 +51,10 @@ resource "random_id" "id" {
 
 #### COGNITO USER POOL
 resource "aws_cognito_user_pool" "user_pool" {
-  count             = local.create_user_pool ? 1 : 0
-  name              = "${local.stage_name}-user-pool"
-  mfa_configuration = "OPTIONAL"
+  count               = local.create_user_pool ? 1 : 0
+  name                = "${local.stage_name}-user-pool"
+  mfa_configuration   = "OPTIONAL"
+  deletion_protection = var.auth.deletion_protection ? "ACTIVE" : "INACTIVE"
 
   auto_verified_attributes = [
     "email",
@@ -131,9 +132,10 @@ resource "aws_cognito_user_pool" "user_pool" {
 }
 
 resource "aws_cognito_user_pool" "host_based" {
-  for_each          = toset(local.host_based_user_pools)
-  name              = "${local.stage_name}-${each.value}"
-  mfa_configuration = "OPTIONAL"
+  for_each            = toset(local.host_based_user_pools)
+  name                = "${local.stage_name}-${each.value}"
+  mfa_configuration   = "OPTIONAL"
+  deletion_protection = local.auth_enabled_hosts[each.value].deletion_protection ? "ACTIVE" : "INACTIVE"
 
   auto_verified_attributes = [
     "email",
@@ -358,7 +360,7 @@ resource "aws_cognito_user_pool_client" "endpoint_centralized" {
 
   allowed_oauth_flows = ["code"]
   logout_urls = [
-    "https://${each.value.hostname}${var.domain_name}"
+    "https://${each.value.hostname}.${var.domain_name}"
   ]
   callback_urls        = [each.value.callback_url]
   default_redirect_uri = each.value.callback_url
