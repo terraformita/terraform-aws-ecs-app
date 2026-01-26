@@ -204,9 +204,19 @@ resource "tls_locally_signed_cert" "ssl" {
   ]
 }
 
+locals {
+  trusted_certs = concat(
+    ["*.${var.domain_name}"],
+    var.additional_domains
+  )
+  create_cert     = var.load_balancer.certificate_arn == null && var.load_balancer.create_acm_certificate
+  certificate_arn = local.create_cert ? aws_acm_certificate.trusted_cert[0].arn : var.load_balancer.certificate_arn
+}
+
 resource "aws_acm_certificate" "trusted_cert" {
+  count                     = local.create_cert ? 1 : 0
   domain_name               = var.domain_name
-  subject_alternative_names = ["*.${var.domain_name}"]
+  subject_alternative_names = local.trusted_certs
   validation_method         = "DNS"
 
   tags = local.tags
@@ -232,26 +242,29 @@ module "ecs_alb" {
   vpc_id  = module.vpc.vpc_id
   subnets = module.vpc.public_subnets
 
-  # For example only
-  enable_deletion_protection = false
+  enable_deletion_protection = var.load_balancer.enable_deletion_protection
 
   # Security Group
-  security_group_ingress_rules = {
-    all_http = {
-      from_port   = 80
-      to_port     = 80
-      ip_protocol = "tcp"
-      description = "HTTP traffic"
-      cidr_ipv4   = "0.0.0.0/0"
+  security_group_ingress_rules = merge(
+    var.load_balancer.redirect_http_to_https ? {
+      all_http = {
+        from_port   = 80
+        to_port     = 80
+        ip_protocol = "tcp"
+        description = "HTTP traffic"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
+    } : {},
+    {
+      all_https = {
+        from_port   = 443
+        to_port     = 443
+        ip_protocol = "tcp"
+        description = "HTTPS traffic"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
     }
-    all_https = {
-      from_port   = 443
-      to_port     = 443
-      ip_protocol = "tcp"
-      description = "HTTPS traffic"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-  }
+  )
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"
@@ -271,45 +284,47 @@ module "ecs_alb" {
     enabled = true
   }
 
-  listeners = {
-    http = {
-      port     = 80
-      protocol = "HTTP"
-      redirect = {
-        port        = "443"
-        protocol    = "HTTPS"
-        status_code = "HTTP_301"
-      }
-    }
-
-    https = merge({
-      port            = 443
-      protocol        = "HTTPS"
-      ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-      certificate_arn = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : aws_acm_certificate.trusted_cert.arn
-
-      forward = {
-        target_group_key = try(local.host_entrypoints[each.key], "error")
-      }
-
-      rules = local.balancer_rules[each.key]
-      },
-      contains(keys(local.auth_enabled_hosts), each.key) && try(local.auth_enabled_hosts[each.key].automated, false) ? merge({
-        authenticate_cognito = {
-          authentication_request_extra_params = {
-            display = "page"
-            prompt  = "login"
-          }
-          on_unauthenticated_request = "authenticate"
-          session_cookie_name        = "AWSELBSession-${each.key}"
-          session_timeout            = 3600
-          user_pool_arn              = try(aws_cognito_user_pool.host_based[each.key].arn, aws_cognito_user_pool.user_pool[0].arn)
-          user_pool_client_id        = try(aws_cognito_user_pool_client.host_based[each.key].id, aws_cognito_user_pool_client.user_pool[0].id)
-          user_pool_domain           = try(aws_cognito_user_pool.host_based[each.key].domain, aws_cognito_user_pool.user_pool[0].domain)
+  listeners = merge(
+    var.load_balancer.redirect_http_to_https ? {
+      http = {
+        port     = 80
+        protocol = "HTTP"
+        redirect = {
+          port        = "443"
+          protocol    = "HTTPS"
+          status_code = "HTTP_301"
         }
-      }, {}) : {}
-    )
-  }
+      }
+    } : {},
+    {
+      https = merge({
+        port            = 443
+        protocol        = "HTTPS"
+        ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+        certificate_arn = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : local.certificate_arn
+
+        forward = {
+          target_group_key = try(local.host_entrypoints[each.key], "error")
+        }
+
+        rules = local.balancer_rules[each.key]
+        },
+        contains(keys(local.auth_enabled_hosts), each.key) && try(local.auth_enabled_hosts[each.key].automated, false) ? merge({
+          authenticate_cognito = {
+            authentication_request_extra_params = {
+              display = "page"
+              prompt  = "login"
+            }
+            on_unauthenticated_request = "authenticate"
+            session_cookie_name        = "AWSELBSession-${each.key}"
+            session_timeout            = 3600
+            user_pool_arn              = try(aws_cognito_user_pool.host_based[each.key].arn, aws_cognito_user_pool.user_pool[0].arn)
+            user_pool_client_id        = try(aws_cognito_user_pool_client.host_based[each.key].id, aws_cognito_user_pool_client.user_pool[0].id)
+            user_pool_domain           = try(aws_cognito_user_pool.host_based[each.key].domain, aws_cognito_user_pool.user_pool[0].domain)
+          }
+        }, {}) : {}
+      )
+  })
 
   target_groups = local.balancer_target_groups[each.key]
 
