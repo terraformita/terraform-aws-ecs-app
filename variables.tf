@@ -63,6 +63,7 @@ variable "auth" {
     refresh_token_validity = optional(number, 1440)
     access_token_validity  = optional(number, 60)
     id_token_validity      = optional(number, 60)
+    deletion_protection    = optional(bool, false)
   })
   default = {}
 }
@@ -88,7 +89,8 @@ variable "host_based_auth" {
     access_token_validity  = optional(number, 60)
     id_token_validity      = optional(number, 60)
 
-    separate_user_pool = optional(bool, false)
+    separate_user_pool  = optional(bool, false)
+    deletion_protection = optional(bool, false)
   }))
   default = {}
 }
@@ -229,6 +231,27 @@ variable "database" {
 
   default  = null
   nullable = true
+}
+
+variable "load_balancer" {
+  description = "Load balancer configuration"
+  type = object({
+    enable_deletion_protection = optional(bool, false)
+    redirect_http_to_https     = optional(bool, true)
+    certificate_arn            = optional(string)
+    create_acm_certificate     = optional(bool, true)
+  })
+  default = {
+    enable_deletion_protection = false
+    redirect_http_to_https     = true
+    create_acm_certificate     = true
+  }
+}
+
+variable "additional_domains" {
+  description = "List of additional domains to include in the SSL certificate."
+  type        = list(string)
+  default     = []
 }
 
 variable "mail_sending" {
