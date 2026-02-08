@@ -240,11 +240,13 @@ variable "load_balancer" {
     redirect_http_to_https     = optional(bool, true)
     certificate_arn            = optional(string)
     create_acm_certificate     = optional(bool, true)
+    waf_enabled                = optional(bool, false)
   })
   default = {
     enable_deletion_protection = false
     redirect_http_to_https     = true
     create_acm_certificate     = true
+    waf_enabled                = false
   }
 }
 
@@ -329,4 +331,37 @@ variable "ok_actions" {
   description = "The list of actions to execute when this alarm transitions into an OK state from any other state. Each action is specified as an Amazon Resource Name (ARN)."
   type        = list(string)
   default     = []
+}
+
+variable "waf_config" {
+  description = "Configuration for AWS WAF managed rules. Object containing 'aws-managed-rules' map."
+  type        = map(map(list(string)))
+  default = {
+    "aws-managed-rules" = {
+      "AWSManagedRulesAmazonIpReputationList" = []
+      "AWSManagedRulesKnownBadInputsRuleSet"  = []
+      "AWSManagedRulesSQLiRuleSet"            = []
+      "AWSManagedRulesLinuxRuleSet"           = []
+      "AWSManagedRulesUnixRuleSet"            = []
+      "AWSManagedRulesCommonRuleSet" = [
+        "SizeRestrictions_BODY",
+        "GenericRFI_BODY"
+      ]
+    }
+  }
+}
+
+variable "waf_logging_enabled" {
+  description = "Enable WAF logging to CloudWatch."
+  type        = bool
+  default     = false
+}
+
+variable "waf_logging_config" {
+  description = "Configuration for WAF logging (retention, kms_key_id)."
+  type = object({
+    retention_in_days = number
+    kms_key_id        = optional(string)
+  })
+  default = null
 }
