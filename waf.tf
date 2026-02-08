@@ -10,18 +10,18 @@ locals {
   }
 
   waf_rules = [
-    for name, exclusions in var.waf_config["aws-managed-rules"] : {
+    for i, name in sort(keys(var.waf_config["aws-managed-rules"])) : {
       name        = name
       vendor_name = "AWS"
       # Use known priority or fallback to alphabetical index offset (100+)
-      priority = lookup(local.waf_rule_priorities, name, 100)
+      priority = lookup(local.waf_rule_priorities, name, 100 + (i * 10))
       version  = null
       action   = { block = {} }
       statement = {
         name        = name
         vendor_name = "AWS"
         rule_action_override = {
-          for rule_name in exclusions : rule_name => {
+          for rule_name in var.waf_config["aws-managed-rules"][name] : rule_name => {
             action = "count"
           }
         }
@@ -68,8 +68,8 @@ module "waf_log_group" {
   count = var.load_balancer.waf_enabled && var.waf_logging_enabled ? 1 : 0
 
   name              = "aws-waf-logs-${var.stage_name}-waf"
-  retention_in_days = var.waf_logging_config.retention_in_days
-  kms_key_id        = var.waf_logging_config.kms_key_id
+  retention_in_days = try(var.waf_logging_config.retention_in_days, 7)
+  kms_key_id        = try(var.waf_logging_config.kms_key_id, null)
 
   tags = var.tags
 }
