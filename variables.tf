@@ -384,5 +384,5 @@ variable "waf_logging_config" {
 variable "ecr_force_delete" {
   description = "Whether to force delete the ECR repository."
   type        = bool
-  default     = true
+  default     = false
 }
