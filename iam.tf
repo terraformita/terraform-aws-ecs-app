@@ -12,6 +12,7 @@ resource "aws_iam_role" "execution_role" {
       }
     }]
   })
+  tags = local.tags
 }
 
 locals {
@@ -159,6 +160,7 @@ data "aws_iam_policy_document" "execution_role_policy" {
 resource "aws_iam_policy" "execution_role" {
   name   = "${local.stage_name}-ecs-exec-role-policy"
   policy = data.aws_iam_policy_document.execution_role_policy.json
+  tags   = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "execution_role" {
@@ -180,6 +182,7 @@ resource "aws_iam_role" "task_role" {
       }
     }]
   })
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "task_role_policy" {
@@ -300,6 +303,7 @@ resource "aws_iam_policy" "task_role" {
   for_each = local.app_containers_map
   name     = "${local.stage_name}-ecs-task-role-${each.key}-policy"
   policy   = data.aws_iam_policy_document.task_role_policy[each.key].json
+  tags     = local.tags
 }
 
 resource "aws_iam_role_policy_attachment" "task_role" {

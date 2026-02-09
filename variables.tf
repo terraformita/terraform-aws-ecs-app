@@ -166,6 +166,9 @@ variable "containers" {
       scale_in_cooldown  = optional(number)
       scale_out_cooldown = optional(number)
     }), {})
+
+    ecr_tag_mutability = optional(string, "MUTABLE")
+    ecr_max_images     = optional(number, 128)
   }))
 }
 
@@ -376,4 +379,10 @@ variable "waf_logging_config" {
     kms_key_id        = optional(string)
   })
   default = null
+}
+
+variable "ecr_force_delete" {
+  description = "Whether to force delete the ECR repository."
+  type        = bool
+  default     = true
 }
