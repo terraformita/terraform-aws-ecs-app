@@ -53,8 +53,23 @@ resource "random_id" "id" {
 resource "aws_cognito_user_pool" "user_pool" {
   count               = local.create_user_pool ? 1 : 0
   name                = "${local.stage_name}-user-pool"
-  mfa_configuration   = "OPTIONAL"
+  mfa_configuration   = var.auth.mfa_configuration
+  user_pool_tier      = var.auth.user_pool_tier
   deletion_protection = var.auth.deletion_protection ? "ACTIVE" : "INACTIVE"
+
+  dynamic "user_pool_add_ons" {
+    for_each = var.auth.advanced_security_mode != null ? [1] : []
+    content {
+      advanced_security_mode = var.auth.advanced_security_mode
+
+      dynamic "advanced_security_additional_flows" {
+        for_each = [1]
+        content {
+          custom_auth_mode = var.auth.advanced_security_mode
+        }
+      }
+    }
+  }
 
   auto_verified_attributes = [
     "email",
@@ -134,8 +149,23 @@ resource "aws_cognito_user_pool" "user_pool" {
 resource "aws_cognito_user_pool" "host_based" {
   for_each            = toset(local.host_based_user_pools)
   name                = "${local.stage_name}-${each.value}"
-  mfa_configuration   = "OPTIONAL"
+  mfa_configuration   = local.auth_enabled_hosts[each.value].mfa_configuration
+  user_pool_tier      = local.auth_enabled_hosts[each.value].user_pool_tier
   deletion_protection = local.auth_enabled_hosts[each.value].deletion_protection ? "ACTIVE" : "INACTIVE"
+
+  dynamic "user_pool_add_ons" {
+    for_each = local.auth_enabled_hosts[each.value].advanced_security_mode != null ? [1] : []
+    content {
+      advanced_security_mode = local.auth_enabled_hosts[each.value].advanced_security_mode
+
+      dynamic "advanced_security_additional_flows" {
+        for_each = [1]
+        content {
+          custom_auth_mode = local.auth_enabled_hosts[each.value].advanced_security_mode
+        }
+      }
+    }
+  }
 
   auto_verified_attributes = [
     "email",
