@@ -144,6 +144,10 @@ resource "aws_cognito_user_pool" "user_pool" {
   #   email_verification_message = var.messages.email_verification_message
 
   tags = local.tags
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cognito_send_sms
+  ]
 }
 
 resource "aws_cognito_user_pool" "host_based" {
@@ -239,6 +243,10 @@ resource "aws_cognito_user_pool" "host_based" {
   #   email_verification_message = var.messages.email_verification_message
 
   tags = local.tags
+
+  depends_on = [
+    aws_iam_role_policy_attachment.cognito_send_sms
+  ]
 }
 
 # TODO: return this back when possible
