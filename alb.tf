@@ -263,7 +263,8 @@ module "ecs_alb" {
         description = "HTTPS traffic"
         cidr_ipv4   = "0.0.0.0/0"
       }
-    }
+    },
+    var.load_balancer.additional_security_group_ingress_rules
   )
   security_group_egress_rules = {
     all = {
