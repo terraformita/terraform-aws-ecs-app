@@ -256,12 +256,20 @@ variable "load_balancer" {
     certificate_arn            = optional(string)
     create_acm_certificate     = optional(bool, true)
     waf_enabled                = optional(bool, false)
+    additional_security_group_ingress_rules = optional(map(object({
+      from_port   = number
+      to_port     = number
+      ip_protocol = string
+      description = optional(string)
+      cidr_ipv4   = optional(string)
+    })), {})
   })
   default = {
-    enable_deletion_protection = false
-    redirect_http_to_https     = true
-    create_acm_certificate     = true
-    waf_enabled                = false
+    enable_deletion_protection              = false
+    redirect_http_to_https                  = true
+    create_acm_certificate                  = true
+    waf_enabled                             = false
+    additional_security_group_ingress_rules = {}
   }
 }
 
