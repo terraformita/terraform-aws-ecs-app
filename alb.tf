@@ -236,22 +236,25 @@ module "ecs_alb" {
   enable_deletion_protection = false
 
   # Security Group
-  security_group_ingress_rules = {
-    all_http = {
-      from_port   = 80
-      to_port     = 82
-      ip_protocol = "tcp"
-      description = "HTTP traffic"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-    all_https = {
-      from_port   = 443
-      to_port     = 445
-      ip_protocol = "tcp"
-      description = "HTTPS traffic"
-      cidr_ipv4   = "0.0.0.0/0"
-    }
-  }
+  security_group_ingress_rules = merge(
+    {
+      all_http = {
+        from_port   = 80
+        to_port     = 82
+        ip_protocol = "tcp"
+        description = "HTTP traffic"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
+      all_https = {
+        from_port   = 443
+        to_port     = 445
+        ip_protocol = "tcp"
+        description = "HTTPS traffic"
+        cidr_ipv4   = "0.0.0.0/0"
+      }
+    },
+    var.additional_security_group_ingress_rules
+  )
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"

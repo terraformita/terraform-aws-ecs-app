@@ -179,6 +179,18 @@ variable "ssl_certificate" {
   }
 }
 
+variable "additional_security_group_ingress_rules" {
+  description = "Additional ingress rules merged into the ALB security group, e.g. for a listener added outside this module"
+  type = map(object({
+    from_port   = number
+    to_port     = number
+    ip_protocol = string
+    description = optional(string)
+    cidr_ipv4   = optional(string)
+  }))
+  default = {}
+}
+
 variable "access_logs_bucket_id" {
   description = "ID of the S3 bucket to store access logs"
   type        = string
