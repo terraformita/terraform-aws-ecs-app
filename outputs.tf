@@ -41,3 +41,15 @@ output "vpc" {
     vpc_cidr_block          = module.vpc.vpc_cidr_block
   }
 }
+
+output "alb" {
+  value = {
+    for hostname, alb in module.ecs_alb : hostname => {
+      arn               = alb.arn
+      dns_name          = alb.dns_name
+      security_group_id = alb.security_group_id
+      certificate_arn   = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : aws_acm_certificate.trusted_cert.arn
+      target_groups     = alb.target_groups
+    }
+  }
+}
