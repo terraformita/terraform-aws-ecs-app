@@ -191,6 +191,12 @@ variable "additional_security_group_ingress_rules" {
   default = {}
 }
 
+variable "additional_listeners" {
+  description = "Additional listeners merged into the ALB, e.g. for a private listener reachable only via VPC Link"
+  type        = map(any)
+  default     = {}
+}
+
 variable "access_logs_bucket_id" {
   description = "ID of the S3 bucket to store access logs"
   type        = string

@@ -274,7 +274,7 @@ module "ecs_alb" {
     enabled = true
   }
 
-  listeners = {
+  listeners = merge({
     http = {
       port     = 80
       protocol = "HTTP"
@@ -312,7 +312,15 @@ module "ecs_alb" {
         }
       }, {}) : {}
     )
-  }
+    },
+    {
+      for key, listener in var.additional_listeners :
+      key => merge(
+        { certificate_arn = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : aws_acm_certificate.trusted_cert.arn },
+        listener
+      )
+    }
+  )
 
   target_groups = local.balancer_target_groups[each.key]
 
