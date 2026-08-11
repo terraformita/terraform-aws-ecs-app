@@ -263,6 +263,7 @@ variable "load_balancer" {
       description = optional(string)
       cidr_ipv4   = optional(string)
     })), {})
+    additional_listeners = optional(map(any), {})
   })
   default = {
     enable_deletion_protection              = false
@@ -270,6 +271,7 @@ variable "load_balancer" {
     create_acm_certificate                  = true
     waf_enabled                             = false
     additional_security_group_ingress_rules = {}
+    additional_listeners                    = {}
   }
 }
 

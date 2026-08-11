@@ -51,6 +51,7 @@ output "alb" {
       security_group_id = alb.security_group_id
       certificate_arn   = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : local.certificate_arn
       target_groups     = alb.target_groups
+      listeners         = alb.listeners
     }
   }
 }

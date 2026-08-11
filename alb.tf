@@ -325,7 +325,15 @@ module "ecs_alb" {
           }
         }, {}) : {}
       )
-  })
+    },
+    {
+      for key, listener in var.load_balancer.additional_listeners :
+      key => merge(
+        { certificate_arn = var.ssl_certificate.self_signed ? aws_acm_certificate.self_signed_cert.arn : local.certificate_arn },
+        listener
+      )
+    }
+  )
 
   target_groups = local.balancer_target_groups[each.key]
 
